@@ -22,24 +22,25 @@ const schema = buildSchema(`
   }
   type Airline {
     id: Int,
+    type: String,
     callsign: String,
     country: String,
     iata: String,
     icao: String,
     name: String,
-    type: String,
     docKey: String
   }
   type Airport {
+    id: Int,
+    type: String,
     airportname: String,
     city: String,
     country: String,
     faa: String,
     geo: Geo,
     icao: String,
-    id: Int,
-    type: String,
-    tz: String
+    tz: String,
+    docKey: String
   }
   type Geo {
     alt: Int,
@@ -51,7 +52,8 @@ const schema = buildSchema(`
 const root = {
   airportsByCountry: (data) => {
     let statement =`
-    SELECT id, type, airportname, city, country, faa, geo, icao, tz
+    SELECT id, type, airportname, city, country, faa, geo, icao, tz,
+      type || '_' || TOSTRING(id) AS docKey
     FROM \`travel-sample\`
     WHERE type = 'airport'
     AND country = $COUNTRY
@@ -68,6 +70,7 @@ const root = {
   airlinesByCountry: (data) => {
     let statement =`
     SELECT id, type, callsign, country, iata, icao, name,
+      type || '_' || TOSTRING(id) AS docKey
     FROM \`travel-sample\`
     WHERE type = 'airline'
     AND country = $COUNTRY
